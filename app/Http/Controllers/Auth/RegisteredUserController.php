@@ -42,8 +42,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Catatan: Registrasi publik otomatis memberikan role Mahasiswa, bukan role administratif.
-        $user->assignRole('Mahasiswa');
+        // Catatan: Registrasi publik otomatis memberikan role Mahasiswa; role dibuat jika database belum disiapkan seeder.
+        $studentRole = \Spatie\Permission\Models\Role::findOrCreate('Mahasiswa', 'web');
+        $user->assignRole($studentRole);
 
         event(new Registered($user));
 
