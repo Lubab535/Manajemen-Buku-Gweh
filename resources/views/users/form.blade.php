@@ -1,0 +1,5 @@
+@php($selectedRole = old('role', $user?->roles->first()?->name))
+<div class="mb-3"><label class="form-label">Nama</label><input class="form-control" name="name" value="{{ old('name', $user?->name) }}" required><x-input-error :messages="$errors->get('name')" /></div>
+<div class="mb-3"><label class="form-label">Email</label><input class="form-control" type="email" name="email" value="{{ old('email', $user?->email) }}" required><x-input-error :messages="$errors->get('email')" /></div>
+<div class="row"><div class="col-md-6 mb-3"><label class="form-label">Password {{ $user ? '(kosongkan jika tidak diubah)' : '' }}</label><input class="form-control" type="password" name="password"><x-input-error :messages="$errors->get('password')" /></div><div class="col-md-6 mb-3"><label class="form-label">Konfirmasi Password</label><input class="form-control" type="password" name="password_confirmation"></div></div>
+<div class="mb-3"><label class="form-label">Role</label><select class="form-select" name="role" required>@foreach(['Admin','Dosen','Mahasiswa'] as $role)<option value="{{ $role }}" @selected($selectedRole === $role)>{{ $role }}</option>@endforeach</select></div>
