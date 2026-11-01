@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -30,22 +31,25 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // 1. Registrasi divalidasi agar nama, email unik, dan konfirmasi password terpenuhi.
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // 2. Data akun baru disimpan ke tabel users dengan password yang dienkripsi.
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // Catatan: Registrasi publik otomatis memberikan role Mahasiswa; role dibuat jika database belum disiapkan seeder.
-        $studentRole = \Spatie\Permission\Models\Role::findOrCreate('Mahasiswa', 'web');
+        // 3. Spatie menyiapkan role Mahasiswa; assignRole() menghubungkannya ke akun baru.
+        $studentRole = Role::findOrCreate('Mahasiswa', 'web');
         $user->assignRole($studentRole);
 
+        // 4. Event registrasi dipicu, sesi login aktif, lalu pengguna diarahkan ke dashboard.
         event(new Registered($user));
 
         Auth::login($user);

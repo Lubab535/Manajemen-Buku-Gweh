@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Book;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,9 +17,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Catatan: Seeder membuat tiga role dan akun demo beserta data role masing-masing.
+        // Seeder Spatie: setiap nama berikut menjadi role yang tersimpan pada tabel roles.
         foreach (['Admin', 'Dosen', 'Mahasiswa'] as $role) {
-            \Spatie\Permission\Models\Role::findOrCreate($role);
+            Role::findOrCreate($role);
         }
 
         $accounts = [
@@ -27,14 +29,16 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($accounts as [$role, $email, $name]) {
+            // Akun dibuat hanya jika email belum tersedia.
             $user = User::firstOrCreate(
                 ['email' => $email],
                 ['name' => $name, 'password' => 'password']
             );
+            // syncRoles() mengganti role lama agar akun mendapat tepat satu role demo yang sesuai.
             $user->syncRoles([$role]);
         }
 
-        \App\Models\Book::query()->firstOrCreate([
+        Book::query()->firstOrCreate([
             'title' => 'Pemrograman Laravel Modern',
         ], [
             'author' => 'Tim Pengembang Laravel',

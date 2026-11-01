@@ -1,5 +1,6 @@
 <x-guest-layout>
     <h4 class="mb-3">Registrasi Mahasiswa</h4>
+    {{-- Alur: kirim form -> controller memvalidasi -> akun dibuat -> Spatie assignRole Mahasiswa -> login otomatis. --}}
     <form method="POST" action="{{ route('register') }}">
         @csrf
         <div class="mb-3"><label class="form-label">Nama</label><input class="form-control" type="text" name="name" value="{{ old('name') }}" required autofocus><x-input-error :messages="$errors->get('name')" /></div>
